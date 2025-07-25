@@ -1,0 +1,179 @@
+/* ===========================
+   Theme Variables
+   =========================== */
+  @import 'leaflet/dist/leaflet.css';
+/* Default (dark) theme */
+:root {
+  --font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --line-height: 1.5;
+
+  /* Colours */
+  --bg: #242424;
+  --fg: #ececec;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --accent: #646cff;
+  --accent-hover: #535bf2;
+  --error: #e74c3c;
+  --button-bg: #1a1a1a;
+  --input-bg: #333;
+  --input-fg: #fff;
+  --suggestion-bg: #333;      /* opaque suggestion background */
+  --suggestion-border: #555;
+
+  /* Spacing & shadows */
+  --gap: 1rem;
+  --radius: 0.75rem;
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Light theme overrides */
+:root[data-theme="light"] {
+  --bg: #f9fafb;
+  --fg: #222;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --accent: #535bf2;
+  --accent-hover: #646cff;
+  --error: #c0392b;
+  --button-bg: #fff;
+  --input-bg: #fff;
+  --input-fg: #222;
+  --suggestion-bg: #fff;      /* opaque white suggestion background */
+  --suggestion-border: #ccc;
+}
+
+/* ===========================
+   Global Styles
+   =========================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: var(--gap);
+  font-family: var(--font-family);
+  line-height: var(--line-height);
+  background-color: var(--bg);
+  color: var(--fg);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Headings */
+h1, h2 {
+  margin: 0 0 0.5em;
+  font-weight: 600;
+}
+h2 {
+  font-size: 1.25rem;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  background-color: var(--button-bg);
+  color: var(--fg);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 0.6em 1em;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
+}
+button:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Inputs */
+input[type="text"] {
+  width: 100%;
+  padding: 0.5em;
+  border-radius: var(--radius);
+  border: 1px solid var(--suggestion-border);
+  background-color: var(--input-bg);
+  color: var(--input-fg);
+  font-size: 1rem;
+}
+input[type="text"]::placeholder {
+  color: #aaa;
+}
+
+/* Cards */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--gap);
+  margin-bottom: var(--gap);
+  transition: transform 0.2s;
+  position: relative;
+  overflow: visible;
+  z-index: 0;
+}
+/* Pull only the search card above the rest */
+.search-card {
+  z-index: 50 !important;
+}
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* Suggestions dropdown */
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin-top: 0.25em;
+  background-color: var(--suggestion-bg);
+  color: var(--input-fg);
+  border: 1px solid var(--suggestion-border);
+  border-radius: var(--radius);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100 !important;
+}
+.suggestions li {
+  list-style: none;
+}
+.suggestions button {
+  width: 100%;
+  text-align: left;
+  padding: 0.5em;
+  background: transparent;
+  border: none;
+  color: var(--input-fg);
+}
+.suggestions button:hover {
+  background-color: var(--bg);
+}
+
+/* Spinner */
+.spinner {
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Layout constraints */
+#app,
+main {
+  width: 100%;
+  max-width: 480px;
+}
