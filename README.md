@@ -1,47 +1,229 @@
-# Svelte + Vite
+# Weather Dashboard
 
-This template should help get you started developing with Svelte in Vite.
+[![Front-end: Svelte](https://img.shields.io/badge/Front--end-Svelte-ff3e00?logo=svelte)](https://svelte.dev)  
+[![Back-end: FastAPI](https://img.shields.io/badge/Back--end-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com)  
+[![Deploy: Render](https://img.shields.io/badge/Deploy-Render-18A0FB?logo=render)](https://render.com)  
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-## Recommended IDE Setup
+**A Progressive Web App for real-time weather and 5-day forecasts**, featuring:
+- Interactive min/max temperature chart  
+- Embedded map for geographic context  
+- “Favourites” list and unit toggling (°C/°F)  
+- Offline support & installable as a PWA  
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+**Live Demo:** https://weather-dashboard-frontend-dfi2.onrender.com  
+**Backend API:** https://weather-dashboard-backend-kxei.onrender.com  
 
-## Need an official Svelte framework?
+## Table of Contents
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+1. [Features](#features)  
+2. [Tech Stack](#tech-stack)  
+3. [Demo](#demo)  
+4. [Installation](#installation)  
+5. [Configuration](#configuration)  
+6. [Usage](#usage)  
+7. [PWA & Offline Support](#pwa--offline-support)  
+8. [Contributing](#contributing)  
+9. [License](#license)  
 
-## Technical considerations
+## Features
 
-**Why use this over SvelteKit?**
+- **Search & Geolocation Autosuggest**  
+  Start typing any city name and get instant location suggestions (city, state, country) powered by OpenWeatherMap’s geocoding API.
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+- **Current Weather Display**  
+  Shows city & country, weather icon & description, current temperature, min/max temperatures, “feels like,” humidity, and wind speed.
 
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+- **5-Day Interactive Forecast Chart**  
+  A responsive line chart (Chart.js) plotting daily min / max temperatures over the next five days—visualize trends at a glance.
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+- **Embedded Map View**  
+  A Leaflet map centered on the selected location, with a marker and popup displaying the city name.
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+- **Favourites List**  
+  Save your favorite cities into localStorage and switch between them with a single click.
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+- **Unit Toggle (°C / °F)**  
+  Seamlessly switch between metric and imperial units; all displays and charts update accordingly.
 
-**Why include `.vscode/extensions.json`?**
+- **Theme Switcher (Dark / Light)**  
+  Toggle between dark and light modes, with your preference persisted and synced via URL parameters.
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+- **PWA & Offline Support**  
+  Installable as a Progressive Web App, caches static assets and last‐fetched weather so you can view your dashboard offline.
 
-**Why enable `checkJs` in the JS template?**
+- **URL State Sync**  
+  Automatically encodes `city`, `units`, and `theme` in the URL query string for easy sharing and bookmarking.
 
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
+## Tech Stack & Architecture
 
-**Why is HMR not preserving my local component state?**
+### Frontend
+- **Framework**: Svelte v5 + Vite  
+- **Styling**: Tailwind CSS (utility-first) + CSS custom properties for theming  
+- **Charts**: Chart.js (`chart.js/auto`) for the 5-day min/max temperature line chart  
+- **Maps**: Leaflet + OpenStreetMap tiles for the embedded city map  
+- **Utilities**:  
+  - Lodash’s `debounce` for type-ahead geocoding  
+  - Browser Geolocation API as a fallback  
+  - `localStorage` for “Favourites” persistence  
+  - URLSearchParams to sync `city`, `units`, `theme` in the URL  
+- **PWA**:  
+  - `vite-plugin-pwa` to generate a service worker  
+  - Caches static assets and last API response for offline use  
+  - `beforeinstallprompt` hook for “Install App” button  
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
+### Backend
+- **Language & Framework**: Python 3.13 + FastAPI  
+- **Server**: Uvicorn ASGI  
+- **Env Management**: python-dotenv (`.env` for `OPENWEATHER_API_KEY`)  
+- **HTTP Client**: `requests` to call OpenWeatherMap  
+- **Endpoints**:  
+  - `/weather` – current weather  
+  - `/forecast` – 5-day grouped forecast  
+  - `/geocode` – autocomplete suggestions  
+  - `/healthz` – simple health check for uptime pings  
+- **CORS**: `CORSMiddleware` to allow the frontend  
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+### External APIs & Services
+- **OpenWeatherMap** – free tier for weather, forecast, geocoding  
+- **Render.com** – hosting both frontend (static) and backend (Hobby Free)  
+- **UptimeRobot** / **GitHub Actions** – keep-alive pings to prevent spin-down  
 
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+### High-Level Architecture
+1. **User** → Svelte SPA  
+2. SPA → FastAPI endpoints (`/weather`, `/forecast`, `/geocode`)  
+3. FastAPI → OpenWeatherMap (weather & geocode)  
+4. Responses flow back & are:  
+   - Rendered in UI  
+   - Cached by the service worker for offline  
+   - Stored in `localStorage` if “Favourited”  
+
+## Installation
+
+> ⚙️ These instructions will get you a local copy of the project up and running on your machine for development and testing purposes.
+
+### Prerequisites
+
+- **Node.js** v16+ and **npm** (or Yarn)  
+- **Python** 3.13+  
+- A free **OpenWeatherMap** API key (sign up at https://home.openweathermap.org/users/sign_up)  
+
+---
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/<your-username>/weather-dashboard.git
+cd weather-dashboard
 ```
+### 2. Backend Setup (FastAPI)
+    Create & activate a virtual environment
+    cd backend
+    python3 -m venv venv
+    source venv/bin/activate      # macOS/Linux
+    # venv\Scripts\activate       # Windows PowerShell
+
+### 3. Configure environment variables
+   Copy the example and add your key:
+    cp .env.example .env
+
+    Edit .env and set:
+    OPENWEATHER_API_KEY=your_openweathermap_api_key_here
+
+### 4. Run the development server
+    uvicorn main:app --reload
+    
+    The API will be available at http://127.0.0.1:8000
+    Health check: http://127.0.0.1:8000/healthz
+
+3. Frontend Setup (Svelte + Vite)
+Install dependencies
+cd ../frontend
+
+npm install
+# or yarn
+# yarn install
+
+Configure environment variables
+
+Create a .env file in /frontend:
+
+cp .env.local.example .env.local
+
+Edit .env.local and set:
+VITE_API_BASE_URL=http://127.0.0.1:8000
+
+Run the development server
+
+npm run dev
+# or yarn dev
+Your app will be live at http://localhost:5173 (or the port shown in your console).
+
+4. Build for Production
+Backend: no build step required—just deploy your /backend folder to your favorite host (e.g. Render, Heroku).
+Frontend:
+cd frontend
+npm run build
+# or yarn build
+The production-ready files will be in frontend/dist/—deploy these as a static site (e.g. to Render static site, Netlify, Vercel).
+
+5. Verify Everything
+API:
+curl http://127.0.0.1:8000/healthz
+should return { "status": "ok" }.
+Frontend:
+Visit your local dev URL and confirm:
+You can search for a city
+Current weather, chart, and map load correctly
+Favourites and PWA “Install” prompt work
+Once both servers are running, your dashboard will fetch data from the locally served API and you’re all set for development!
+
+## Configuration
+
+### Backend (`/backend/.env`)
+| Variable                | Description                                 | Example                              |
+|-------------------------|---------------------------------------------|--------------------------------------|
+| `OPENWEATHER_API_KEY`   | Your OpenWeatherMap API key                 | `abcdef1234567890abcdef1234567890`   |
+
+### Frontend (`/frontend/.env.local`)
+| Variable                | Description                                 | Default                              |
+|-------------------------|---------------------------------------------|--------------------------------------|
+| `VITE_API_BASE_URL`     | Base URL of your deployed or local backend  | `http://127.0.0.1:8000`              |
+
+> After editing, restart your servers so the changes take effect.
+
+---
+
+## Usage
+
+1. **Start both servers** (see [Installation](#installation)).  
+2. **Open** your browser at `http://localhost:5173`.  
+3. **Search** for a city or allow geolocation to auto-load your local weather.  
+4. **Select** from the dropdown to fetch current weather, 5-day chart, and map.  
+5. **Toggle** °C/°F or Dark/Light theme—your choice is synced in the URL.  
+6. **Add** cities to your Favourites bar for one-click recall.  
+7. **Install** the PWA via the “Install App” button to view cached data offline.
+
+---
+
+## PWA & Offline Support
+
+- **Service Worker** (via `vite-plugin-pwa`) caches:  
+  - All static assets (JS, CSS, icons)  
+  - Last successful `/weather` & `/forecast` API responses  
+- **Offline Behavior**:  
+  - App shell loads even without network.  
+  - Displays the most recent fetched weather & forecast.  
+  - Disables “Get Weather” if no cache exists for the queried city.  
+- **Clearing Cache**:  
+  - Open DevTools → Application → Clear storage → “Unregister service worker” & “Clear site data”.
+
+---
+
+## Contributing
+
+We welcome community contributions!  
+
+1. **Fork** the repo and create a feature branch:  
+   ```bash
+   git checkout -b feature/my-new-feature
